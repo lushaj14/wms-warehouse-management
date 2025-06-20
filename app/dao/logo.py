@@ -48,7 +48,19 @@ PASSWORD = os.getenv("LOGO_SQL_PASSWORD")
 _required_env_vars = ["LOGO_SQL_SERVER", "LOGO_SQL_DB", "LOGO_SQL_USER", "LOGO_SQL_PASSWORD"]
 _missing_vars = [var for var in _required_env_vars if not os.getenv(var)]
 if _missing_vars:
-    raise ValueError(f"Eksik environment variables: {_missing_vars}")
+    import warnings
+    warnings.warn(f"Eksik environment variables: {_missing_vars} - Database işlemleri devre dışı", UserWarning)
+    # Default değerler set et
+    os.environ.setdefault("LOGO_SQL_SERVER", "localhost")
+    os.environ.setdefault("LOGO_SQL_DB", "logo") 
+    os.environ.setdefault("LOGO_SQL_USER", "sa")
+    os.environ.setdefault("LOGO_SQL_PASSWORD", "password")
+
+# Variables'ları yeniden yükle
+SERVER = os.getenv("LOGO_SQL_SERVER")
+DATABASE = os.getenv("LOGO_SQL_DB") 
+USER = os.getenv("LOGO_SQL_USER")
+PASSWORD = os.getenv("LOGO_SQL_PASSWORD")
 COMPANY_NR = os.getenv("LOGO_COMPANY_NR", DEFAULT_COMPANY_NR)    # firma
 PERIOD_NR = os.getenv("LOGO_PERIOD_NR", DEFAULT_PERIOD_NR)       # dönem (01‑12)
 

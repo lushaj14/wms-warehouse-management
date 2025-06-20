@@ -159,6 +159,26 @@ python run_tests.py --type all
 
 Bu proje MIT lisansı altında lisanslanmıştır.
 
+## 🔧 Troubleshooting
+
+### Database Bağlantı Hatası
+```
+ValueError: Eksik environment variables: ['LOGO_SQL_SERVER', ...]
+```
+
+**Çözüm:**
+1. `.env.example` dosyasını `.env` olarak kopyalayın
+2. `.env` dosyasındaki database bilgilerini güncelleyin
+3. Veya SQL Server yoksa file-based sistemle çalışacak
+
+### PyQt5 Kurulum Sorunu
+```bash
+pip install PyQt5 --force-reinstall
+```
+
+### ODBC Driver Eksik (Windows)
+Microsoft ODBC Driver 17+ for SQL Server indirin.
+
 ## 🆘 Destek
 
 Sorunlar için [Issues](https://github.com/lushaj14/wms-warehouse-management/issues) bölümünü kullanın.

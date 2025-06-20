@@ -2,12 +2,20 @@
 # ──────────────────────────────────────────────────────────
 #  Uygulama giriş noktası
 # ──────────────────────────────────────────────────────────
+import os
 import logging
 import sys
 import traceback
 from pathlib import Path
 
-import os
+# Environment variables'ları ilk önce set et (import'lardan önce!)
+os.environ.setdefault("LOGO_SQL_SERVER", "78.135.108.160,1433")
+os.environ.setdefault("LOGO_SQL_DB", "logo") 
+os.environ.setdefault("LOGO_SQL_USER", "barkod1")
+os.environ.setdefault("LOGO_SQL_PASSWORD", "Barkod14*")
+os.environ.setdefault("LOGO_COMPANY_NR", "025")
+os.environ.setdefault("LOGO_PERIOD_NR", "01")
+
 from PyQt5.QtCore import Qt, QCoreApplication
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QApplication, QMessageBox
@@ -16,14 +24,6 @@ import app.settings as settings
 from app.core.logger import WMSLogger
 from app.core.error_handler import setup_global_exception_handler
 from app.ui.main_window import MainWindow
-
-# Test için environment variables'ları manuel set et
-os.environ.setdefault("LOGO_SQL_SERVER", "78.135.108.160,1433")
-os.environ.setdefault("LOGO_SQL_DB", "logo") 
-os.environ.setdefault("LOGO_SQL_USER", "barkod1")
-os.environ.setdefault("LOGO_SQL_PASSWORD", "Barkod14*")
-os.environ.setdefault("LOGO_COMPANY_NR", "025")
-os.environ.setdefault("LOGO_PERIOD_NR", "01")
 
 # Logger sistemini başlat
 WMSLogger.initialize()
