@@ -189,7 +189,7 @@ class ScannerPage(QWidget):
         self.order_combo.addItem("-- Sipariş Seçin --")
         
         for order in orders:
-            self.order_combo.addItem(f"{order['order_no']} ({order['customer']})")
+            self.order_combo.addItem(f"{order['order_no']} ({order['customer_name']})")
 
     def _order_selected(self, order_text: str):
         """Sipariş seçildiğinde çalışır"""

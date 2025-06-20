@@ -1,15 +1,17 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "build_date": "2025-06-20",
-  "commit_sha": "",
+  "commit_sha": "ad0f409249256cee77bde58aae7c2aca64c9bde9",
   "branch": "main",
   "features": [
     "SQL-based user management",
     "Error handling system", 
     "Auto-update capability",
     "Activity logging",
-    "Role-based permissions"
+    "Role-based permissions",
+    "Fixed scanner page field mapping",
+    "Improved auto-update restart process"
   ],
-  "updated_at": "2025-06-20T17:00:00",
-  "update_method": "initial"
+  "updated_at": "2025-06-20T18:45:00",
+  "update_method": "bugfix"
 }
