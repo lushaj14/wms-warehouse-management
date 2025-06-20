@@ -1,0 +1,16 @@
+{
+  "ui": {
+    "theme": "light",
+    "font_pt": 10,
+    "sound_on": true,
+    "toast_sec": 3
+  },
+  "db": {
+    "retry": 3,
+    "heartbeat_sec": 10
+  },
+  "paths": {
+    "label_dir": "labels",
+    "export_dir": "C:\\Users\\User\\Desktop"
+  }
+}

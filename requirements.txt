@@ -1,0 +1,7 @@
+PyQt5
+pyodbc
+pandas
+openpyxl
+xlrd
+python-dotenv
+qrcode pillow
