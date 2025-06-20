@@ -175,3 +175,48 @@ log_barcode_scan("barcode", "item_code", "order_no", "STATUS")
 - Activity tracking (LOGIN, LOGOUT, BARCODE_SCAN, ERROR, etc.)
 - File ve console logging
 - User-specific filtering
+
+### Auto-Update System 🔄
+
+Comprehensive auto-update system with GitHub integration:
+
+#### Features
+- **GitHub API Integration**: Automatic update checking
+- **Silent Updates**: Background download and installation
+- **User Consent**: Confirmation dialogs before updates
+- **Progress Tracking**: Real-time update progress
+- **Auto-Restart**: Automatic application restart after update
+- **Backup Protection**: Critical files preserved during updates
+
+#### Usage
+```python
+from app.core.updater import AutoUpdater
+
+# Check for updates
+updater = AutoUpdater(parent_widget)
+update_info = updater.check_for_updates()
+
+# Perform update
+if update_info:
+    updater.perform_update(update_info)
+```
+
+#### Menu Integration
+- **Help → Güncelleme Kontrol Et** (Ctrl+U)
+- **Help → Sürüm Bilgisi**: Version and features info
+- **Startup Check**: Silent update notification (5s delay)
+
+#### Update Process
+1. GitHub API commit comparison
+2. User confirmation with changelog
+3. Download latest release
+4. Backup critical files (config.json, users.json, etc.)
+5. Extract and install new files
+6. Auto-restart application
+
+#### Configuration
+Update `app/core/updater.py` for your repository:
+```python
+GITHUB_OWNER = "yourusername"
+GITHUB_REPO = "wms-warehouse-management"
+```
