@@ -380,13 +380,14 @@ class AutoUpdater(QObject):
             # Mevcut script path'i al
             script_path = sys.argv[0]
             
-            # Yeni process başlat
-            if sys.platform.startswith('win'):
-                # Windows
-                subprocess.Popen([sys.executable, script_path])
-            else:
-                # Linux/Mac
-                subprocess.Popen([sys.executable, script_path])
+            # Manual restart message
+            QMessageBox.information(
+                self.parent,
+                "Güncelleme Tamamlandı",
+                "Güncelleme başarıyla tamamlandı!\n\n"
+                "Uygulamayı kapatıp yeniden başlatın.",
+                QMessageBox.Ok
+            )
             
             # Mevcut uygulamayı kapat
             QApplication.instance().quit()
