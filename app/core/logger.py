@@ -35,17 +35,15 @@ class ContextFilter(logging.Filter):
     """Kullanıcı context bilgilerini log'a ekler"""
     
     def filter(self, record):
-        # User context'i varsa ekle (circular import'ı önlemek için try-except)
-        try:
-            from app.core.auth import get_current_user
-            current_user = get_current_user()
-            record.username = current_user.get('username', 'anonymous') if current_user else 'anonymous'
-            record.user_id = current_user.get('user_id', 'N/A') if current_user else 'N/A'
-        except (ImportError, AttributeError):
-            # Auth sistemi henüz hazır değil
-            record.username = 'system'
-            record.user_id = 'N/A'
+        # User context'i varsa ekle (circular import'ı önlemek için global var kullan)
+        record.username = getattr(self, '_current_username', 'system')
+        record.user_id = getattr(self, '_current_user_id', 'N/A')
         return True
+    
+    def set_user_context(self, username: str, user_id: str):
+        """User context'i manuel olarak set et (circular import olmadan)"""
+        self._current_username = username
+        self._current_user_id = user_id
 
 
 class WMSLogger:

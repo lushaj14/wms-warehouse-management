@@ -236,6 +236,17 @@ class SessionManager:
             self.current_user = user
             self.session_start = datetime.now()
             
+            # Logger context'ini güncelle (circular import olmadan)
+            try:
+                from app.core.logger import WMSLogger
+                for logger_instance in WMSLogger._loggers.values():
+                    for handler in logger_instance.handlers:
+                        for filter_obj in handler.filters:
+                            if hasattr(filter_obj, 'set_user_context'):
+                                filter_obj.set_user_context(user.username, str(user.user_id))
+            except:
+                pass  # Logger context set edilemezse önemli değil
+            
             # Session bilgilerini logla
             from app.core.logger import log_user_action
             log_user_action(

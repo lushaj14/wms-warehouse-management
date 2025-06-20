@@ -85,9 +85,9 @@ class DatabaseUserManager:
         
         try:
             exec_sql(create_table_sql)
-            logger.info(f"Table {self.table_name} checked/created successfully")
+            print(f"Table {self.table_name} checked/created successfully")  # Basit print kullan
         except Exception as e:
-            logger.error(f"Error creating table {self.table_name}: {e}")
+            print(f"Error creating table {self.table_name}: {e}")  # Basit print kullan
             raise DatabaseException(f"Kullanıcı tablosu oluşturulamadı: {str(e)}")
     
     def _create_default_admin(self):
@@ -110,10 +110,10 @@ class DatabaseUserManager:
             }
             
             self.create_user(admin_data)
-            logger.info("Default admin user created with username: admin, password: hakan14")
+            print("Default admin user created with username: admin, password: hakan14")
             
         except Exception as e:
-            logger.error(f"Error creating default admin user: {e}")
+            print(f"Error creating default admin user: {e}")
     
     def _hash_password(self, password: str) -> str:
         """Şifreyi hash'le"""
