@@ -4,7 +4,7 @@ pandas
 openpyxl
 xlrd
 python-dotenv
-qrcode pillow
+qrcode[pil]
 
 # Test dependencies
 pytest>=7.0.0
