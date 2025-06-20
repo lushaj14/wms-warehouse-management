@@ -18,7 +18,7 @@ from PyQt5.QtGui import QFont, QIcon, QPalette, QColor
 from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QListWidget, QListWidgetItem, QStackedWidget,
     QHBoxLayout, QSizePolicy, QAction, QLabel, QDialog, QVBoxLayout,
-    QTextEdit, QApplication
+    QTextEdit, QApplication, QMessageBox
 )
 
 from app import register_toast
@@ -274,38 +274,6 @@ class MainWindow(QMainWindow):
         log_user_action("ACTIVITY_VIEWER_OPENED", "Aktivite görüntüleyici açıldı")
         ActivityViewer(self).exec_()
     
-    def _switch_user(self):
-        """Kullanıcı değiştir"""
-        current_user = self.session_manager.get_current_user()
-        switch_dialog = UserSwitchDialog(current_user, self)
-        
-        if switch_dialog.exec_() == QDialog.Accepted:
-            # UI'ı güncelle
-            new_user = self.session_manager.get_current_user()
-            self.setWindowTitle(f"LOGLine Yönetim Paneli - {new_user.full_name} ({new_user.role})")
-            self.lbl_user.setText(f"👤 {new_user.username} | {new_user.role}")
-            
-            # Menü'yü yeniden oluştur
-            self.menuBar().clear()
-            self._setup_menu_bar()
-            
-            self._show_toast("Kullanıcı Değişti", f"Şimdi {new_user.full_name} olarak giriş yaptınız")
-    
-    def _logout(self):
-        """Çıkış yap"""
-        from PyQt5.QtWidgets import QMessageBox
-        
-        reply = QMessageBox.question(
-            self, 
-            "Çıkış Yap", 
-            "Uygulamadan çıkmak istediğinizden emin misiniz?",
-            QMessageBox.Yes | QMessageBox.No
-        )
-        
-        if reply == QMessageBox.Yes:
-            log_user_action("LOGOUT", "Kullanıcı çıkış yaptı")
-            self.session_manager.logout()
-            self.close()
 
     def _load_page(self, idx: int):
         """
@@ -399,6 +367,38 @@ class MainWindow(QMainWindow):
         
         dialog = UserManagementDialog(self)
         dialog.exec_()
+    
+    def _switch_user(self):
+        """Kullanıcı değiştir"""
+        current_user = self.session_manager.get_current_user()
+        switch_dialog = UserSwitchDialog(current_user, self)
+        
+        if switch_dialog.exec_() == QDialog.Accepted:
+            # UI'ı güncelle
+            new_user = self.session_manager.get_current_user()
+            self.setWindowTitle(f"LOGLine Yönetim Paneli - {new_user.full_name} ({new_user.role})")
+            self.lbl_user.setText(f"👤 {new_user.username} | {new_user.role}")
+            
+            # Menü'yü yeniden oluştur
+            self.menuBar().clear()
+            self._setup_menu_bar()
+            
+            self._show_toast("Kullanıcı Değişti", f"Şimdi {new_user.full_name} olarak giriş yaptınız")
+    
+    def _logout(self):
+        """Çıkış yap"""
+        reply = QMessageBox.question(
+            self,
+            "Çıkış Onayı",
+            "Uygulamadan çıkmak istediğinizden emin misiniz?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+        
+        if reply == QMessageBox.Yes:
+            log_user_action("LOGOUT", "Kullanıcı çıkış yaptı")
+            self.session_manager.logout()
+            self.close()
 
     def _setup_auto_updater(self):
         """Auto-updater'ı başlat"""

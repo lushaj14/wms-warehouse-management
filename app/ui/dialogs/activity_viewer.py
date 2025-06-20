@@ -1,5 +1,11 @@
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QTableWidget, QTableWidgetItem, QComboBox, QLineEdit
-from app.dao.logo import fetch_activities
+
+# Import'u try-except ile sarala (pyodbc sorunları için)
+try:
+    from app.dao.logo import fetch_activities
+except ImportError:
+    def fetch_activities(*args, **kwargs):
+        return []  # Fallback function
 
 class ActivityViewer(QDialog):
     def __init__(self, parent=None):

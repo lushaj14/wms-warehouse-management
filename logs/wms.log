@@ -1,2 +1,6 @@
 2025-06-20 17:03:19,993 [[33mWARNING[0m] app.core.auth: Database user management not available, using file-based: No module named 'pyodbc' [User: system, ID: N/A] [/home/hakan/your_project/app/core/auth.py:28]
 2025-06-20 17:05:56,553 [[33mWARNING[0m] app.core.auth: Database user management not available, using file-based: No module named 'pyodbc' [User: system, ID: N/A] [/home/hakan/your_project/app/core/auth.py:28]
+2025-06-20 18:05:44,784 [[33mWARNING[0m] app.core.auth: Database user management not available, using file-based: No module named 'pyodbc' [User: system, ID: N/A] [/home/hakan/your_project/app/core/auth.py:28]
+2025-06-20 18:07:57,411 [[33mWARNING[0m] app.core.auth: Database user management not available, using file-based: No module named 'pyodbc' [User: system, ID: N/A] [/home/hakan/your_project/app/core/auth.py:28]
+2025-06-20 18:07:57,415 [[32mINFO[0m] app.core.auth: Loaded 3 users from users.json [User: system, ID: N/A] [/home/hakan/your_project/app/core/auth.py:81]
+2025-06-20 18:07:57,416 [[32mINFO[0m] app.core.auth: Initialized file-based user manager [User: system, ID: N/A] [/home/hakan/your_project/app/core/auth.py:68]
