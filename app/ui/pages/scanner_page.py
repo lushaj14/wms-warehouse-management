@@ -71,12 +71,13 @@ logger = get_logger(__name__)
 
 def barcode_xref_lookup(barcode: str, warehouse_id: str | None = None):
     """
-    Barkodu barcode_xref tablosunda arar.
+    Barkodu barcode_xref tablosunda arar, bulamazsa Logo ERP native tablolarında arar.
       • warehouse_id verilmişse → o depoda arar
       • None ise                → depoya bakmadan ilk eşleşmeyi döndürür
     Dönen: (item_code, multiplier)  |  (None, None)
     """
     try:
+        # İlk önce custom barcode_xref tablosuna bak
         if warehouse_id is not None:
             row = fetch_one(
                 "SELECT TOP 1 item_code, multiplier "
@@ -90,6 +91,19 @@ def barcode_xref_lookup(barcode: str, warehouse_id: str | None = None):
             )
         if row:
             return row["item_code"], row.get("multiplier", 1)
+        
+        # Bulamazsa Logo ERP native tablolarında ara
+        from app.dao.logo import resolve_barcode_prefix
+        if warehouse_id is not None:
+            try:
+                wh_id = int(warehouse_id) if isinstance(warehouse_id, str) else warehouse_id
+                item_code = resolve_barcode_prefix(barcode, wh_id)
+                if item_code:
+                    logger.info(f"Barkod Logo ERP'de bulundu: {barcode} -> {item_code}")
+                    return item_code, 1  # default multiplier
+            except (ValueError, TypeError):
+                pass
+        
     except Exception as exc:
         logger.error(f"[barcode_xref_lookup] DB error: {exc}")
     return None, None
@@ -241,8 +255,13 @@ class ScannerPage(QWidget):
             return
         
         try:
-            # Barkod lookup
-            item_code, multiplier = barcode_xref_lookup(barcode)
+            # Warehouse ID'yi order lines'dan al (fallback için gerekli)
+            warehouse_id = None
+            if self._order_lines:
+                warehouse_id = self._order_lines[0].get("warehouse_id", 0)
+            
+            # Barkod lookup (fallback mechanism ile)
+            item_code, multiplier = barcode_xref_lookup(barcode, warehouse_id)
             
             if not item_code:
                 snd_err.play()
