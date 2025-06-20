@@ -21,7 +21,7 @@ Modern depo yönetim sistemi PyQt5 ile geliştirilmiş, barkod tarama, etiket ya
 
 ### 1. Projeyi İndirin
 ```bash
-git clone https://github.com/yourusername/wms-warehouse-management.git
+git clone https://github.com/lushaj14/wms-warehouse-management.git
 cd wms-warehouse-management
 ```
 
@@ -161,7 +161,7 @@ Bu proje MIT lisansı altında lisanslanmıştır.
 
 ## 🆘 Destek
 
-Sorunlar için [Issues](https://github.com/yourusername/wms-warehouse-management/issues) bölümünü kullanın.
+Sorunlar için [Issues](https://github.com/lushaj14/wms-warehouse-management/issues) bölümünü kullanın.
 
 ## 📚 Dokümantasyon
 

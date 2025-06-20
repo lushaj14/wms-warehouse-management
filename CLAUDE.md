@@ -217,6 +217,6 @@ if update_info:
 #### Configuration
 Update `app/core/updater.py` for your repository:
 ```python
-GITHUB_OWNER = "yourusername"
+GITHUB_OWNER = "lushaj14"
 GITHUB_REPO = "wms-warehouse-management"
 ```

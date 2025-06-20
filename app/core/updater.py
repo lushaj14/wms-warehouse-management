@@ -26,7 +26,7 @@ from app.core.error_handler import handle_error
 logger = get_logger(__name__)
 
 # GitHub repository bilgileri
-GITHUB_OWNER = "yourusername"  # GitHub kullanıcı adınız
+GITHUB_OWNER = "lushaj14"  # GitHub kullanıcı adınız
 GITHUB_REPO = "wms-warehouse-management"  # Repository adı
 GITHUB_API_URL = f"https://api.github.com/repos/{GITHUB_OWNER}/{GITHUB_REPO}"
 GITHUB_DOWNLOAD_URL = f"https://github.com/{GITHUB_OWNER}/{GITHUB_REPO}/archive/refs/heads/main.zip"
