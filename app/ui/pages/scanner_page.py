@@ -115,7 +115,8 @@ class ScannerPage(QWidget):
     def __init__(self):
         super().__init__()
         self.logger = get_logger(__name__)
-        self._current_order = None
+        self._current_order = None  # order_no (string)
+        self._current_order_id = None  # order_id (int) 
         self._order_lines = []
         self._setup_ui()
         self._load_orders()
@@ -210,6 +211,7 @@ class ScannerPage(QWidget):
         """Sipariş seçildiğinde çalışır"""
         if order_text.startswith("--"):
             self._current_order = None
+            self._current_order_id = None
             self._order_lines = []
             self.table.setRowCount(0)
             self.complete_btn.setEnabled(False)
@@ -222,14 +224,34 @@ class ScannerPage(QWidget):
             order_id = self.order_combo.itemData(current_index)
             order_no = order_text.split(" ")[0]
             self._current_order = order_no
+            self._current_order_id = order_id  # ID'yi de sakla
             self._load_order_lines(order_id)
 
     @error_handler_decorator("Sipariş satırları yüklenemedi", show_dialog=True)
     def _load_order_lines(self, order_id: int):
-        """Sipariş satırlarını yükle"""
+        """Sipariş satırlarını yükle ve WMS queue state ile senkronize et"""
+        from app.dao.logo import queue_fetch
+        
+        # Logo ERP'den order lines'ı al
         self._order_lines = fetch_order_lines(order_id)
         if not self._order_lines:
             raise OrderNotFoundException(f"Order ID: {order_id}")
+        
+        # WMS queue state ile senkronize et
+        try:
+            queue_lines = queue_fetch(order_id)
+            for line in self._order_lines:
+                # Queue'dan qty_sent değerini al
+                queue_line = next((q for q in queue_lines if q["item_code"] == line["item_code"]), None)
+                if queue_line:
+                    line["qty_scanned"] = queue_line["qty_sent"]
+                    self.logger.debug(f"Synced {line['item_code']}: scanned={queue_line['qty_sent']}")
+                else:
+                    line["qty_scanned"] = 0
+        except Exception as e:
+            self.logger.warning(f"Queue sync failed: {e}, using defaults")
+            for line in self._order_lines:
+                line["qty_scanned"] = 0
         
         self._update_table()
         self.complete_btn.setEnabled(True)
@@ -285,8 +307,8 @@ class ScannerPage(QWidget):
                     context={"item_code": item_code, "qty_scanned": scanned, "qty_ordered": line["qty_ordered"]}
                 )
             
-            # Miktarı artır
-            queue_inc(self._current_order, item_code, multiplier or 1)
+            # Miktarı artır (order_id kullan, order_no değil!)
+            queue_inc(self._current_order_id, item_code, multiplier or 1)
             line["qty_scanned"] = scanned + (multiplier or 1)
             
             # Tabloyu güncelle
@@ -347,8 +369,8 @@ class ScannerPage(QWidget):
             if reply != QMessageBox.Yes:
                 return
         
-        # Siparişi tamamla
-        update_order_status(self._current_order, 4)  # STATUS = 4 (Tamamlandı)
+        # Siparişi tamamla (order_id kullan!)
+        update_order_status(self._current_order_id, 4)  # STATUS = 4 (Tamamlandı)
         
         # Sevkiyat kayıtları
         for line in self._order_lines:
@@ -364,10 +386,11 @@ class ScannerPage(QWidget):
                     scanned
                 )
         
-        # Kuyruktan temizle
-        queue_delete(self._current_order)
+        # Kuyruktan temizle (order_id kullan!)
+        queue_delete(self._current_order_id)
         
-        toast.show("Başarılı", "Sipariş tamamlandı!")
+        from app import toast
+        toast("Başarılı", "Sipariş tamamlandı!")
         self._load_orders()  # Listeyi yenile
 
     @error_handler_decorator("Etiketler yazdırılamadı", show_dialog=True)
