@@ -122,8 +122,9 @@ class BarcodePage(QWidget):
 
 
         # Tablo  --------------------------------------------------------------
-        from app.ui.models.xref_model import XrefModel
-        self.tbl = QTableView()
+        self.tbl = QTableWidget()
+        self.tbl.setColumnCount(len(self.COLS))
+        self.tbl.setHorizontalHeaderLabels([col[1] for col in self.COLS])
         self.tbl.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         lay.addWidget(self.tbl)
         QShortcut(QKeySequence("Delete"), self.tbl, activated=self._delete_selected)
@@ -147,7 +148,9 @@ class BarcodePage(QWidget):
     def refresh(self):
         wh = None if self.cmb_wh.currentIndex() == 0 else self.cmb_wh.currentText()
         text = self.search.text().strip()
-        self.tbl.setModel(XrefModel(wh_filter=wh, text=text))
+        # Fetch data and populate table
+        rows = fetch_barcodes(wh, text)
+        self._populate(rows)
 
     def _populate(self, rows: List[Dict[str, Any]]):
         self.tbl.setRowCount(0)

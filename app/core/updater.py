@@ -406,8 +406,7 @@ class AutoUpdater(QObject):
         if update_info:
             # Toast notification
             from app import toast
-            toast.show(
+            toast(
                 "Güncelleme Mevcut", 
-                "Yeni güncelleme var! Menüden kontrol edin.",
-                duration=5000
+                "Yeni güncelleme var! Menüden kontrol edin."
             )

@@ -104,6 +104,11 @@ class ScannerPage(QWidget):
         self._order_lines = []
         self._setup_ui()
         self._load_orders()
+        
+        # Auto-refresh timer for picking orders (30 seconds)
+        self._refresh_timer = QTimer()
+        self._refresh_timer.timeout.connect(self._load_orders)
+        self._refresh_timer.start(30000)  # 30 saniye
 
     def _setup_ui(self):
         """UI bileşenlerini oluşturur"""
@@ -175,9 +180,10 @@ class ScannerPage(QWidget):
         layout.addLayout(button_layout)
 
     @error_handler_decorator("Siparişler yüklenemedi", show_toast=True)
-    def _load_orders(self):
+    def _load_orders(self, checked=None):
         """Siparişleri yükle"""
         orders = fetch_picking_orders()
+        self.logger.info(f"Scanner'a {len(orders)} picking siparişi yüklendi")
         self.order_combo.clear()
         self.order_combo.addItem("-- Sipariş Seçin --")
         
