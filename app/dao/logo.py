@@ -23,27 +23,34 @@ CREATE TABLE dbo.WMS_PICKQUEUE (
 ```
 """
 from __future__ import annotations
-import time
-MAX_RETRY = 3
-RETRY_WAIT = 2  # saniye
 import os
 import logging
+import time
+import uuid
 from contextlib import contextmanager
 from typing import Any, Dict, List
-import uuid
+
 import pyodbc
+
+from app.constants import MAX_RETRY, RETRY_WAIT, DEFAULT_COMPANY_NR, DEFAULT_PERIOD_NR
 
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Bağlantı Ayarları –  env > fallback
 # ---------------------------------------------------------------------------
-SERVER     = os.getenv("LOGO_SQL_SERVER", "78.135.108.160,1433")
-DATABASE   = os.getenv("LOGO_SQL_DB", "logo")
-USER       = os.getenv("LOGO_SQL_USER", "barkod1")
-PASSWORD   = os.getenv("LOGO_SQL_PASSWORD", "Barkod14*")
-COMPANY_NR = os.getenv("LOGO_COMPANY_NR", "025")    # firma
-PERIOD_NR  = os.getenv("LOGO_PERIOD_NR", "01")       # dönem (01‑12)
+SERVER = os.getenv("LOGO_SQL_SERVER")
+DATABASE = os.getenv("LOGO_SQL_DB") 
+USER = os.getenv("LOGO_SQL_USER")
+PASSWORD = os.getenv("LOGO_SQL_PASSWORD")
+
+# Gerekli environment variables kontrolü
+_required_env_vars = ["LOGO_SQL_SERVER", "LOGO_SQL_DB", "LOGO_SQL_USER", "LOGO_SQL_PASSWORD"]
+_missing_vars = [var for var in _required_env_vars if not os.getenv(var)]
+if _missing_vars:
+    raise ValueError(f"Eksik environment variables: {_missing_vars}")
+COMPANY_NR = os.getenv("LOGO_COMPANY_NR", DEFAULT_COMPANY_NR)    # firma
+PERIOD_NR = os.getenv("LOGO_PERIOD_NR", DEFAULT_PERIOD_NR)       # dönem (01‑12)
 
 # --- Sürücü seçimi ----------------------------------------------------------
 _available = [d for d in pyodbc.drivers() if d.startswith("ODBC Driver") and "SQL Server" in d]

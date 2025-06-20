@@ -1,0 +1,2 @@
+2025-06-20 17:03:19,993 [[33mWARNING[0m] app.core.auth: Database user management not available, using file-based: No module named 'pyodbc' [User: system, ID: N/A] [/home/hakan/your_project/app/core/auth.py:28]
+2025-06-20 17:05:56,553 [[33mWARNING[0m] app.core.auth: Database user management not available, using file-based: No module named 'pyodbc' [User: system, ID: N/A] [/home/hakan/your_project/app/core/auth.py:28]

@@ -5,3 +5,15 @@ openpyxl
 xlrd
 python-dotenv
 qrcode pillow
+
+# Test dependencies
+pytest>=7.0.0
+pytest-mock>=3.8.0
+pytest-cov>=4.0.0
+pytest-asyncio>=0.21.0
+pytest-qt>=4.2.0
+factory-boy>=3.2.0
+
+# Development dependencies
+colorama>=0.4.6  # Colored logging
+cryptography>=3.4.8  # Future password hashing

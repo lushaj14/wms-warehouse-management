@@ -35,8 +35,13 @@ sys.path.append(str(BASE_DIR))
 
 try:
     from app.dao import logo as dao
+    from app.core.auth import get_current_user
+    from app.core.logger import get_logger, log_user_action
 except ModuleNotFoundError:
     import dao.logo as dao
+    get_current_user = lambda: None
+    get_logger = lambda x: logging.getLogger(x)
+    log_user_action = lambda *args, **kwargs: None
 
 import pyodbc
 from reportlab.pdfgen import canvas
@@ -188,6 +193,17 @@ def make_labels(order_no: str, *, force: bool = False, footer: str = ""):
     # — adres satırlarını kır —
     adres_raw   = (hdr.get("adres", "").upper()).split()
     adres_lines = [" ".join(adres_raw[i:i + 6]) for i in range(0, len(adres_raw), 6)][:2]
+    
+    # Footer'a kullanıcı bilgisi ekle
+    current_user = get_current_user()
+    user_info = ""
+    if current_user:
+        user_info = f"Hazırlayan: {current_user.get('full_name', current_user.get('username', 'N/A'))}"
+    
+    # Footer'ı birleştir
+    combined_footer = footer
+    if user_info:
+        combined_footer = f"{footer} | {user_info}" if footer else user_info
 
     for i in range(1, pkg_tot + 1):
         barkod = f"{barkod_root}-K{i}"             # ← 🔸 YENİ: paket no ekle
@@ -204,11 +220,21 @@ def make_labels(order_no: str, *, force: bool = False, footer: str = ""):
             "sip_tarih":  dt.datetime.now().strftime("%d-%m-%Y"),
             "transfer":   hdr.get("genexp1", "").strip(";"),
             "inv_line":   "FATURA BU PAKETİN İÇİNDEDİR" if i == 1 else "",
-            "footer":     footer,
+            "footer":     combined_footer,
         }
         draw_page(c, payload)
 
     c.save()
+    
+    # User activity log
+    log_user_action(
+        "LABEL_PRINT",
+        f"Etiket yazdırıldı",
+        order_no=order_no,
+        package_count=pkg_tot,
+        pdf_path=str(pdf_path)
+    )
+    
     logging.info("PDF etiketi oluşturuldu → %s", pdf_path)
 
 

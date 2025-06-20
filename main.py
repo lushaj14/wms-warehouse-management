@@ -2,15 +2,34 @@
 # ──────────────────────────────────────────────────────────
 #  Uygulama giriş noktası
 # ──────────────────────────────────────────────────────────
-import sys, traceback, logging
+import logging
+import sys
+import traceback
 from pathlib import Path
 
-from PyQt5.QtCore    import Qt, QCoreApplication
-from PyQt5.QtGui     import QFont
+import os
+from PyQt5.QtCore import Qt, QCoreApplication
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QApplication, QMessageBox
 
+import app.settings as settings
+from app.core.logger import WMSLogger
+from app.core.error_handler import setup_global_exception_handler
 from app.ui.main_window import MainWindow
-import app.settings as settings            # ‹ settings.py içindeki fonksiyonlara erişim
+
+# Test için environment variables'ları manuel set et
+os.environ.setdefault("LOGO_SQL_SERVER", "78.135.108.160,1433")
+os.environ.setdefault("LOGO_SQL_DB", "logo") 
+os.environ.setdefault("LOGO_SQL_USER", "barkod1")
+os.environ.setdefault("LOGO_SQL_PASSWORD", "Barkod14*")
+os.environ.setdefault("LOGO_COMPANY_NR", "025")
+os.environ.setdefault("LOGO_PERIOD_NR", "01")
+
+# Logger sistemini başlat
+WMSLogger.initialize()
+
+# Global exception handler'ı kur
+setup_global_exception_handler()
 
 # ──────────────────────────────────────────────────────────
 # 1) 4K / yüksek-DPI ekran desteği

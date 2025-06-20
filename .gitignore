@@ -1,0 +1,10 @@
+# Python derleme dosyaları
+__pycache__/
+*.py[cod]
+
+# Windows ADS (Zone.Identifier)
+*:Zone.Identifier
+
+# IDE / Editor
+.vscode/
+*.code-workspace
