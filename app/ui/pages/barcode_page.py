@@ -37,22 +37,26 @@ def fetch_barcodes(wh: str | None = None, text: str = "") -> List[Dict[str, Any]
     if _dao_fetch_all is None:
         return []
 
-    sql     = "SELECT barcode, warehouse_id, item_code, multiplier, updated_at FROM dbo.barcode_xref"
-    where   = []
-    params: list[Any] = []
+    try:
+        sql     = "SELECT barcode, warehouse_id, item_code, multiplier, updated_at FROM dbo.barcode_xref"
+        where   = []
+        params: list[Any] = []
 
-    if wh is not None:
-        where.append("warehouse_id = ?")
-        params.append(wh)
-    if text:
-        where.append("(barcode LIKE ? OR item_code LIKE ?)")
-        params.extend([f"%{text}%", f"%{text}%"])
+        if wh is not None:
+            where.append("warehouse_id = ?")
+            params.append(wh)
+        if text:
+            where.append("(barcode LIKE ? OR item_code LIKE ?)")
+            params.extend([f"%{text}%", f"%{text}%"])
 
-    if where:
-        sql += " WHERE " + " AND ".join(where)
+        if where:
+            sql += " WHERE " + " AND ".join(where)
 
-    sql += " ORDER BY updated_at DESC, barcode"
-    return _dao_fetch_all(sql, *params)
+        sql += " ORDER BY updated_at DESC, barcode"
+        return _dao_fetch_all(sql, *params)
+    except Exception as e:
+        print(f"Barcode fetch error: {e}")
+        return []  # Boş liste döndür, donma önlenir
 
 
 def upsert_barcode(barcode: str, wh: str, item_code: str, mul: float | Decimal = 1.0):
@@ -98,7 +102,14 @@ class BarcodePage(QWidget):
     def __init__(self):
         super().__init__()
         self._build_ui()
-        self.refresh()
+        # Lazy loading - refresh sadece gerektiğinde
+        self._data_loaded = False
+    
+    def showEvent(self, event):
+        """Sayfa gösterildiğinde data yükle"""
+        super().showEvent(event)
+        if not self._data_loaded:
+            self.refresh()
 
     # ---------------------------------------------------------------- UI ---
     def _build_ui(self):
@@ -151,6 +162,7 @@ class BarcodePage(QWidget):
         # Fetch data and populate table
         rows = fetch_barcodes(wh, text)
         self._populate(rows)
+        self._data_loaded = True
 
     def _populate(self, rows: List[Dict[str, Any]]):
         self.tbl.setRowCount(0)

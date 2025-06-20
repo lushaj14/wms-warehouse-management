@@ -189,7 +189,8 @@ class ScannerPage(QWidget):
         self.order_combo.addItem("-- Sipariş Seçin --")
         
         for order in orders:
-            self.order_combo.addItem(f"{order['order_no']} ({order['customer_name']})")
+            display_text = f"{order['order_no']} ({order['customer_name']})"
+            self.order_combo.addItem(display_text, order['order_id'])  # order_id'yi data olarak sakla
 
     def _order_selected(self, order_text: str):
         """Sipariş seçildiğinde çalışır"""
@@ -201,16 +202,20 @@ class ScannerPage(QWidget):
             self.print_btn.setEnabled(False)
             return
         
-        order_no = order_text.split(" ")[0]
-        self._current_order = order_no
-        self._load_order_lines(order_no)
+        # Seçili item'dan order_id'yi al
+        current_index = self.order_combo.currentIndex()
+        if current_index > 0:  # İlk item "-- Sipariş Seçin --" olduğu için
+            order_id = self.order_combo.itemData(current_index)
+            order_no = order_text.split(" ")[0]
+            self._current_order = order_no
+            self._load_order_lines(order_id)
 
     @error_handler_decorator("Sipariş satırları yüklenemedi", show_dialog=True)
-    def _load_order_lines(self, order_no: str):
+    def _load_order_lines(self, order_id: int):
         """Sipariş satırlarını yükle"""
-        self._order_lines = fetch_order_lines(order_no)
+        self._order_lines = fetch_order_lines(order_id)
         if not self._order_lines:
-            raise OrderNotFoundException(order_no)
+            raise OrderNotFoundException(f"Order ID: {order_id}")
         
         self._update_table()
         self.complete_btn.setEnabled(True)
