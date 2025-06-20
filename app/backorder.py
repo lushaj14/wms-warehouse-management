@@ -46,8 +46,13 @@ def create_tables() -> None:
         warehouse_id  INT,
         invoiced_qty  FLOAT,
         qty_shipped   FLOAT     DEFAULT 0,
-        last_update   DATETIME  DEFAULT GETDATE()
+        loaded        BIT         DEFAULT 0,
+        last_update   DATETIME    DEFAULT GETDATE()
     );
+    
+    -- Mevcut tabloya loaded kolonu ekle (eğer yoksa)
+    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('{SCHEMA}.shipment_lines') AND name = 'loaded')
+    ALTER TABLE {SCHEMA}.shipment_lines ADD loaded BIT DEFAULT 0;
     """
     with get_conn(autocommit=True) as cn:
         cn.execute(ddl)
@@ -88,36 +93,35 @@ def add_shipment(order_no: str,          # sipariş / fatura kökü
                  qty_delta: float):      # bu sevk-tamamlama ile gönderilen
 
     """
-    • Aynı (trip_date + order_no + item_code) satırı varsa
-      qty_sent (eski adı qty_shipped) alanını artırır.
+    • Aynı (order_no + item_code) satırı varsa
+      qty_shipped alanını artırır.
     • Yoksa yeni satır açar.
+    • trip_date parametresi backward compatibility için korunuyor
     """
 
     sql = f"""
     MERGE {SCHEMA}.shipment_lines AS tgt
     USING (SELECT
-              ? AS trip_date,
-              ? AS order_no,
+              ? AS invoice_no,
               ? AS item_code) src
-      ON  tgt.trip_date  = src.trip_date
-      AND tgt.order_no   = src.order_no
+      ON  tgt.invoice_no = src.invoice_no
       AND tgt.item_code  = src.item_code
     WHEN MATCHED THEN
         UPDATE
-           SET qty_sent    = qty_sent + ?,
+           SET qty_shipped = qty_shipped + ?,
                last_update = GETDATE()
     WHEN NOT MATCHED THEN
-        INSERT (trip_date, order_no, item_code,
-                warehouse_id, invoiced_qty, qty_sent, loaded,
+        INSERT (invoice_no, item_code,
+                warehouse_id, invoiced_qty, qty_shipped,
                 last_update)
-        VALUES (?,?,?,?,?,?,0,GETDATE());
+        VALUES (?,?,?,?,?,GETDATE());
     """
 
     with get_conn(autocommit=True) as cn:
         cn.execute(sql,
-                   trip_date, order_no, item_code,      # src
-                   qty_delta,                           # UPDATE
-                   trip_date, order_no, item_code,      # INSERT
+                   order_no, item_code,              # src
+                   qty_delta,                        # UPDATE
+                   order_no, item_code,              # INSERT
                    warehouse_id, invoiced_qty, qty_delta)
 
 

@@ -284,7 +284,7 @@ def trip_by_barkod(inv_root: str, day: str | None = None):
 #  Loader barkod → “yüklendi”
 #  (pkgs_total değerine DOKUNMAZ!)
 # ────────────────────────────────────────────────────────────────
-def mark_loaded(trip_id: int, pkg_no: int, *, item_code: str | None = None):
+def mark_loaded(trip_id: int, pkg_no: int):
     """
     • Aynı barkod ikinci kez okutulursa sayaç artmaz → 0 döner.
     • Koli sayımı (pkgs_loaded) trg_loaded_aiu tetikleyicisiyle yapılır.
@@ -321,18 +321,16 @@ def mark_loaded(trip_id: int, pkg_no: int, *, item_code: str | None = None):
                 trip_id, pkg_no, getpass.getuser()
             )
 
-        # 3) Opsiyonel – ilgili stok satırını işaretle
-        if item_code:
-            cn.execute(
-                """
-                UPDATE shipment_lines
-                   SET loaded = 1
-                 WHERE order_no = (SELECT order_no
-                                     FROM shipment_header
-                                    WHERE id = ?)
-                   AND item_code = ?""",
-                trip_id, item_code
-            )
+        # 3) İlgili tüm stok satırlarını işaretle (paket bazında)
+        cn.execute(
+            """
+            UPDATE shipment_lines
+               SET loaded = 1
+             WHERE order_no = (SELECT order_no
+                                 FROM shipment_header
+                                WHERE id = ?)""",
+            trip_id
+        )
 
         # 4) Tüm koliler tamam mı?  → otomatik “Yükleme Tamam”
         pkgs_loaded, pkgs_total = cn.execute(

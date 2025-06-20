@@ -248,23 +248,7 @@ class LoaderPage(QWidget):
             toast("Uyarı", "Bu paket zaten yüklenmiş!")
             return
 
-        # ──────────────────────────────────────────────
-        # 2) İlgili shipment_lines satırlarını işaretle
-        # ──────────────────────────────────────────────
-        hdr = fetch_one(
-            "SELECT order_no, trip_date "
-            "FROM   shipment_header "
-            "WHERE  id = ?", trip_id
-        )
-        if hdr:
-            exec_sql(
-                """
-                UPDATE shipment_lines
-                   SET loaded = 1
-                 WHERE order_no  = ?
-                   AND trip_date = ?;""",
-                hdr["order_no"], hdr["trip_date"]
-            )
+        # shipment_lines güncellemesi artık mark_loaded() içinde yapılıyor
 
         snd_ok.play()                                   # 🔊 başarılı okuma
         toast("Paket Yüklendi", f"{inv_root} K{pkg_no}")
