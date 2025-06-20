@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Dict
 
 BASE_DIR = Path(__file__).resolve().parents[2]
-CFG_PATH = BASE_DIR / "config.json"
+CFG_PATH = BASE_DIR / "settings.json"
 
 # ───────────── Varsayılanlar ─────────────
 DEFAULTS: Dict[str, Any] = {

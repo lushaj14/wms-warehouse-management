@@ -291,9 +291,13 @@ class MainWindow(QMainWindow):
             mod = import_module(f"app.ui.pages.{mod_name}")
             widget = getattr(mod, cls_name)()
         except Exception as exc:
-            # Hata durumunda placeholder
+            # Hata durumunda placeholder ve log
+            self.logger.error(f"Page loading failed: {title} ({mod_name}.{cls_name}): {exc}")
             widget = QLabel(f"<b>{title}</b><br>Yükleme hatası:<br>{exc}")
             widget.setAlignment(Qt.AlignCenter)
+            
+            # Toast notification
+            self._show_toast("Sayfa Yükleme Hatası", f"{title} sayfası yüklenemedi")
 
         # Apply settings varsa uygula
         if hasattr(widget, "apply_settings") and callable(widget.apply_settings):

@@ -21,7 +21,7 @@ import time
 from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, Tuple
-from app import toast                #  ⇦  satırı ekle
+# Circular import'ı önlemek için toast'ı lazy import edelim
 
 # ---------------------------------------------------------------
 #  Proje modülleri & ortam kurulum
@@ -103,7 +103,13 @@ def process_backorders() -> None:
 
             msg = f"{ord_no}  {item_code}  +{need:.0f} (AMB {wh_id})"
             log.info("TAMAMLANDI ▸ %s", msg)
-            toast("Eksik Ürün Tamamlandı", msg)
+            
+            # Lazy import toast to prevent circular dependency
+            try:
+                from app import toast
+                toast("Eksik Ürün Tamamlandı", msg)
+            except ImportError:
+                pass  # Toast not available, continue silently
         else:
             log.debug(
                 "Yetersiz ▸ %s %s – free %.0f / need %.0f",
