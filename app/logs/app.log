@@ -1566,3 +1566,4 @@ AttributeError: 'QTableView' object has no attribute 'item'
 2025-06-20 17:02:50,188 INFO: Logging başlatıldı  ➜  /home/hakan/your_project/app/logs
 2025-06-20 17:03:19,954 INFO: Logging başlatıldı  ➜  /home/hakan/your_project/app/logs
 2025-06-20 17:05:56,490 INFO: Logging başlatıldı  ➜  /home/hakan/your_project/app/logs
+2025-06-20 17:27:10,357 INFO: Logging başlatıldı  ➜  /home/hakan/your_project/app/logs

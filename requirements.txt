@@ -17,3 +17,4 @@ factory-boy>=3.2.0
 # Development dependencies
 colorama>=0.4.6  # Colored logging
 cryptography>=3.4.8  # Future password hashing
+requests>=2.25.1  # Auto-update system

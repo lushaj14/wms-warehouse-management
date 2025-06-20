@@ -138,6 +138,7 @@ class MainWindow(QMainWindow):
         self._setup_menu_bar()
         self._setup_status_bar()
         self._setup_db_timer()
+        self._setup_auto_updater()
 
     def _setup_central_widget(self):
         """Merkezi widget'ı oluşturur"""
@@ -227,6 +228,20 @@ class MainWindow(QMainWindow):
         
         # Yardım menüsü
         help_menu = menu_bar.addMenu("Yardım")
+        
+        # Güncelleme kontrol et
+        update_action = QAction("Güncelleme Kontrol Et", self, shortcut="Ctrl+U")
+        update_action.triggered.connect(self._check_for_updates)
+        help_menu.addAction(update_action)
+        
+        help_menu.addSeparator()
+        
+        # Version bilgisi
+        version_action = QAction("Sürüm Bilgisi", self)
+        version_action.triggered.connect(self._show_version_info)
+        help_menu.addAction(version_action)
+        
+        # Kısayol kılavuzu
         act_help = QAction("Kısayol Kılavuzu", self, shortcut="F1")
         act_help.triggered.connect(lambda: HelpDialog(self).exec_())
         help_menu.addAction(act_help)
@@ -384,6 +399,82 @@ class MainWindow(QMainWindow):
         
         dialog = UserManagementDialog(self)
         dialog.exec_()
+
+    def _setup_auto_updater(self):
+        """Auto-updater'ı başlat"""
+        try:
+            from app.core.updater import AutoUpdater
+            self.auto_updater = AutoUpdater(self)
+            
+            # Startup'ta güncelleme kontrol et (5 saniye sonra)
+            QTimer.singleShot(5000, self.auto_updater.check_updates_on_startup)
+            
+        except ImportError as e:
+            self.logger.warning(f"Auto-updater not available: {e}")
+    
+    def _check_for_updates(self):
+        """Güncelleme kontrol et"""
+        try:
+            if hasattr(self, 'auto_updater'):
+                update_info = self.auto_updater.check_for_updates()
+                if update_info:
+                    self.auto_updater.perform_update(update_info)
+            else:
+                QMessageBox.information(
+                    self,
+                    "Güncelleme",
+                    "Otomatik güncelleme sistemi mevcut değil.\n"
+                    "GitHub'dan manuel olarak indirebilirsiniz."
+                )
+        except Exception as e:
+            QMessageBox.warning(
+                self,
+                "Güncelleme Hatası", 
+                f"Güncelleme kontrolünde hata: {str(e)}"
+            )
+    
+    def _show_version_info(self):
+        """Version bilgisi göster"""
+        try:
+            import json
+            from pathlib import Path
+            
+            version_file = Path(__file__).parent.parent.parent / "version.json"
+            if version_file.exists():
+                with open(version_file, 'r', encoding='utf-8') as f:
+                    version_data = json.load(f)
+                
+                features_text = "\n".join(f"• {feature}" for feature in version_data.get('features', []))
+                
+                version_text = f"""
+<h3>WMS - Warehouse Management System</h3>
+<p><b>Sürüm:</b> {version_data.get('version', 'Bilinmiyor')}</p>
+<p><b>Build Tarihi:</b> {version_data.get('build_date', 'Bilinmiyor')}</p>
+<p><b>Son Güncelleme:</b> {version_data.get('updated_at', 'Bilinmiyor')}</p>
+<p><b>Güncelleme Yöntemi:</b> {version_data.get('update_method', 'Bilinmiyor')}</p>
+
+<h4>Özellikler:</h4>
+<p>{features_text}</p>
+
+<hr>
+<p><small>Geliştirici: Can Otomotiv IT Ekibi<br>
+GitHub: github.com/yourusername/wms-warehouse-management</small></p>
+                """.strip()
+                
+                QMessageBox.about(self, "Sürüm Bilgisi", version_text)
+            else:
+                QMessageBox.information(
+                    self,
+                    "Sürüm Bilgisi",
+                    "Version bilgisi bulunamadı."
+                )
+                
+        except Exception as e:
+            QMessageBox.warning(
+                self,
+                "Hata",
+                f"Version bilgisi okunamadı: {str(e)}"
+            )
 
     def _update_db_status(self):
         """Veritabanı bağlantı durumunu kontrol et"""
