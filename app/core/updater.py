@@ -16,7 +16,7 @@ from typing import Dict, Optional, Tuple
 from datetime import datetime
 
 import requests
-from PyQt5.QtCore import QObject, pyqtSignal, QThread
+from PyQt5.QtCore import QObject, pyqtSignal, QThread, Qt
 from PyQt5.QtWidgets import QMessageBox, QProgressDialog, QApplication
 
 from app.core.logger import get_logger, log_user_action

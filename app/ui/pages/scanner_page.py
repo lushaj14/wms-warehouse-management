@@ -100,6 +100,7 @@ class ScannerPage(QWidget):
     
     def __init__(self):
         super().__init__()
+        self.logger = get_logger(__name__)
         self._current_order = None
         self._order_lines = []
         self._setup_ui()
