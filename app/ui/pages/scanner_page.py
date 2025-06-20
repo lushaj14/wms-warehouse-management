@@ -350,7 +350,7 @@ class ScannerPage(QWidget):
             self.barcode_input.clear()
 
     @error_handler_decorator("Sipariş tamamlanamadı", show_dialog=True)
-    def _complete_order(self):
+    def _complete_order(self, checked=None):
         """Siparişi tamamla"""
         if not self._current_order:
             return
@@ -394,7 +394,7 @@ class ScannerPage(QWidget):
         self._load_orders()  # Listeyi yenile
 
     @error_handler_decorator("Etiketler yazdırılamadı", show_dialog=True)
-    def _print_labels(self):
+    def _print_labels(self, checked=None):
         """Etiketleri yazdır"""
         if not print_labels or not self._current_order:
             QMessageBox.information(self, "Bilgi", "Etiket servisi mevcut değil!")
